@@ -47,9 +47,10 @@ DFRobotDFPlayerMini myDFPlayer;
 //Initalize Volume Pin
 int potPin = 0; // Assign analog pin to potentiometer
 int volVal = 0; // Variable to read value from potentiometer, starts at 0
+int vol; // Declare vol value
 int oldVolume = 0; // Used to compare volume levels
 int currentVolume = 0; // Used to compare volume levels
-int manualVol = false;
+int manualVol = true;
 
 const int buttonPin = 4;  // Set button pin number to digital pin 4
 int buttonState = 0;  // Variable for reading the button status
