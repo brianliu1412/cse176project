@@ -30,6 +30,13 @@ int oldVolume = 0; // Used to compare volume levels
 int currentVolume = 0; // Used to compare volume levels
 int manualVol = false;
 
+const int buttonPin = 4;  // Set button pin number to digital pin 4
+int buttonState = 0;  // Variable for reading the button status
+char audioArray[3] = {'w', 'b', 'p'}; // Represents the 
+int currIndex = 0;
+
+}
+
 void setup() {
   //Setup Display
   Serial.begin(9600);
@@ -60,6 +67,8 @@ void setup() {
   //
   int state = 0;
 
+  pinMode(buttonPin, INPUT);  // Initialize the button pin as an input
+
 }
 
 void loop() {
@@ -79,19 +88,34 @@ void loop() {
   }
 
     
-
-
+  buttonState = digitalRead(buttonPin);
+  // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
+  if (buttonState == HIGH) {
+    currIndex = incrementIndex(currIndex);
+    playAudio(currIndex);
+  } else {
+    // turn LED off:
+    digitalWrite(ledPin, LOW);
+  }
 
 }
 
+int incrementIndex(int currIndex) {
+  if (currIndex < 2) {
+    return ++currIndex;
+  }
+  else {
+    return 0;
+  }
+}
 
 void playAudio(char audioType) {
   switch (audioType) {
-    case 'white':
+    case 'w':
       myDFPlayer.play(0);
-    case 'brown':
+    case 'b':
       myDFPlayer.play(1);
-    case 'pink':
+    case 'p':
       myDFPlayer.play(2);
   }
 }
