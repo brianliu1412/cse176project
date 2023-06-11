@@ -47,13 +47,14 @@ DFRobotDFPlayerMini myDFPlayer;
 //Initalize Volume Pin
 int potPin = 0; // Assign analog pin to potentiometer
 int volVal = 0; // Variable to read value from potentiometer, starts at 0
+int vol; // Declare vol value
 int oldVolume = 0; // Used to compare volume levels
 int currentVolume = 0; // Used to compare volume levels
-int manualVol = false;
+int manualVol = true;
 
 const int buttonPin = 4;  // Set button pin number to digital pin 4
 int buttonState = 0;  // Variable for reading the button status
-char audioArray[3] = {'w', 'b', 'p'}; // Represents the 
+int audioArray[3] = {1, 2, 3}; // Represents each sound 
 int currIndex = 0;
 
 
@@ -91,9 +92,23 @@ void setup() {
   //
   int state = 0;
 
-  pinMode(buttonPin, INPUT);  // Initialize the button pin as an input
-*/
+  pinMode(buttonPin, INPUT_PULLUP);  // Initialize the button pin as an input
+
 }
+
+
+int incrementIndex(int currIndex) {
+  if (currIndex < 2) {
+    Serial.println(currIndex + 1);
+    return currIndex + 1;
+  }
+  else {
+    Serial.println(currIndex);
+    currIndex = 0;
+    return currIndex;
+  }
+}
+
 
 void loop() {
   /*
@@ -115,35 +130,25 @@ void loop() {
     
   buttonState = digitalRead(buttonPin);
   // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
-  if (buttonState == HIGH) {
+  if (buttonState == LOW) {
+    Serial.println("Hello");
     currIndex = incrementIndex(currIndex);
     playAudio(currIndex);
-  } else {
-    // turn LED off:
-    digitalWrite(ledPin, LOW);
+    delay(500);
   }
  */
   tempDisplayMode(1, 20); //test case 1
   tempDisplayMode(0, 20); //test case 0
 }
 
-int incrementIndex(int currIndex) {
-  if (currIndex < 2) {
-    return ++currIndex;
-  }
-  else {
-    return 0;
-  }
-}
-
-void playAudio(char audioType) {
+void playAudio(int audioType) {
   switch (audioType) {
-    case 'w':
-      myDFPlayer.play(0);
-    case 'b':
+    case 0:
       myDFPlayer.play(1);
-    case 'p':
+    case 1:
       myDFPlayer.play(2);
+    case 2:
+      myDFPlayer.play(3);
   }
 }
 
