@@ -26,10 +26,10 @@
 #define OLIVE       0x7BE0  ///< 123, 125,   0
 #define LIGHTGREY   0xC618  ///< 198, 195, 198
 #define DARKGREY    0x7BEF  ///< 123, 125, 123
-#define BLUE        0x001F  ///<   0,   0, 255
+#define RED        0x001F  ///<   0,   0, 255
 #define GREEN       0x07E0  ///<   0, 255,   0
 #define CYAN        0x07FF  ///<   0, 255, 255
-#define RED         0xF800  ///< 255,   0,   0
+#define BLUE         0xF800  ///< 255,   0,   0
 #define MAGENTA     0xF81F  ///< 255,   0, 255
 #define YELLOW      0xFFE0  ///< 255, 255,   0
 #define WHITE       0xFFFF  ///< 255, 255, 255
@@ -41,7 +41,7 @@
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
 
 //Initialize Audio Libraries
-SoftwareSerial mySoftwareSerial(4, 5);
+SoftwareSerial mySoftwareSerial(2, 3);
 DFRobotDFPlayerMini myDFPlayer;
 
 //Initalize Volume Pin
@@ -56,17 +56,20 @@ int buttonState = 0;  // Variable for reading the button status
 char audioArray[3] = {'w', 'b', 'p'}; // Represents the 
 int currIndex = 0;
 
-}
+
 
 void setup() {
   //Setup Display
   Serial.begin(9600);
   tft.begin();
+  tft.setRotation(2);
 
   //Setup Audio
   mySoftwareSerial.begin(9600); //CHANGE SERIAL??
-  serial.begin(115200);
-
+  Serial.begin(115200);
+  Serial.println(tft.width()); //240 pixels
+  Serial.println(tft.height()); //320 pixels
+  /*
   //Audio Debug
   Serial.println();
   Serial.println(F("DFRobot DFPlayer Mini Demo"));
@@ -89,10 +92,11 @@ void setup() {
   int state = 0;
 
   pinMode(buttonPin, INPUT);  // Initialize the button pin as an input
-
+*/
 }
 
 void loop() {
+  /*
   //Detect Volume Changes
   if (manualVol == true) {
     volVal = analogRead(potPin); //Reads potentiometer value (between 0 and 1023)
@@ -118,7 +122,9 @@ void loop() {
     // turn LED off:
     digitalWrite(ledPin, LOW);
   }
-
+ */
+  tempDisplayMode(1, 20); //test case 1
+  tempDisplayMode(0, 20); //test case 0
 }
 
 int incrementIndex(int currIndex) {
@@ -154,46 +160,73 @@ void tempDisplayMode(int numToDisplay, int volume) {
   tft.fillScreen(WHITE);    //default display = type of white noise, rest flash on screen
   switch (numToDisplay) {
     case 0: //welcome screen - stretch goal
-      tft.setCursor(0,0);
       tft.setTextColor(BLACK);
-      tft.setTextSize(1);
-      tft.println("WELCOME"); //to do
+      tft.setTextSize(2);
+      tft.fillRect(30,200,40,5,BLACK); //fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t t)
+      tft.fillTriangle(10,204,30,190,30,220,BLACK); //fillTriangle(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t t)
+      tft.setCursor(50,30);
+      Serial.println("Case 0!");
+      delay(3000); //to do
+      break;
     case 1: //splash screen - "journey 1.0"
-      tft.setCursor(0,0);
+      tft.setCursor(90,100); 
+      tft.fillScreen(WHITE);
       tft.setTextColor(BLACK);
-      tft.setTextSize(1);
-      tft.println("BROWN NOISE"); //to do
+      tft.setTextSize(2);
+      tft.println("JOURNEY 1.0"); 
+      Serial.println("Case 1!");
+      delay(3000);
+      break;
     case 2: //display white noise
       tft.setCursor(0,0);   //set txt start point - display dimensions: 320 x 240
       tft.setTextColor(BLACK);  //set txt color
       tft.setTextSize(1);       //set txt size
       tft.println("WHITE NOISE");   //print on display
+      Serial.println("Case 2!");
+      delay(3000);
+      break;
     case 3: //display pink noise
       tft.setCursor(0,0);
       tft.setTextColor(BLACK);
       tft.setTextSize(1);
       tft.println("PINK NOISE");
+      Serial.println("Case 3!");
+      delay(3000);
+      break;
     case 4: //display brown noise
       tft.setCursor(0,0);
       tft.setTextColor(BLACK);
       tft.setTextSize(1);
       tft.println("BROWN NOISE");
+      Serial.println("Case 4!");
+      delay(3000);
+      break;
     case 5: //volume value
       tft.setCursor(0,0);
       tft.setTextColor(BLACK);
       tft.setTextSize(1);
-      tft.println(volume);      
+      tft.println(volume);    
+      Serial.println("Case 5!"); 
+      delay(3000); 
+      break;
     case 6: //display "play" 
       tft.setCursor(0,0);
       tft.setTextColor(BLACK);
       tft.setTextSize(1);
       tft.println("PLAY");
+      Serial.println("Case 6!");
+      delay(3000);
+      break;
     case 7: //display "pause"
       tft.setCursor(0,0);
       tft.setTextColor(BLACK);
       tft.setTextSize(1);
       tft.println("PAUSE");
-    case 8: //display "off" - have a great day!
+      Serial.println("Case 7!");
+      delay(3000);
+      break;
+    //case 8: //display "off" - have a great day!
+    
   }
 
 }
