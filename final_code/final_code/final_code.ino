@@ -236,7 +236,10 @@ void loop() {
   }
 }
 
-//Code to check for single click or double click
+/*
+ * Function to check for single click or double click
+ * Returns int corresponding to the enum defined above
+ */
 int chkButton (void) {
     const  unsigned long ButTimeout  = 400;
     static unsigned long msecLst;
