@@ -1,4 +1,7 @@
-//Add imports
+/*
+ * CSE 176A: Tranquil Tones Final Code 
+ * Group: Brian, Emily, Rainee, Satchel
+*/
 
 //The folder name needs to be mp3, placed under the SD card root directory, and the mp3 file name needs to be 4 digits, for example, "0001.mp3", placed under the mp3 folder. If you want to name it in Both English and Chinese, you can add it after the number, for example, "0001hello.mp3" or "0001后来.mp3".
 
@@ -50,39 +53,36 @@ DFRobotDFPlayerMini myDFPlayer;
 
 //Initalize Volume Pin
 int volVal = 0; // Variable to read value from potentiometer, starts at 0
-int vol; // Declare vol value
 int oldVol = 0; // Used to compare volume levels
 int manualVol = true;
-int dbVal;
 int prevVolVal = 0;
+int dbVal;
 
-//States
+//Buttons
+byte butLst;
+const int buttonPinOne = 4;  // Set button pin number to digital pin 4
+const int buttonPinTwo = 6;  // Button pin two to digital pin 6
+enum { None, SingleClick, DoubleClick }; // Enumerate single and double click
+int buttonState = 0;  // Variable for reading the button status
+
+//Boolean for States
 bool audioPlaying = true;
 bool startScreenPlayed = false;
-bool volDisplayFirst = false;
 
-byte butLst;
-
-enum { None, SingleClick, DoubleClick };
-
-
-const int buttonPinOne = 4;  // Set button pin number to digital pin 4
-const int buttonPinTwo = 6;
-int buttonState = 0;  // Variable for reading the button status
+// Audio Variables
 int audioArray[3] = {1, 2, 3}; // Represents each sound 
 int currIndex = 1;
 int currDisplayIndex = 0;
 
 
-
 void setup() {
   //Setup Display
   Serial.begin(9600);
-  tft.begin();
-  tempDisplayMode(8, NULL);
+  tft.begin(); 
+  tempDisplayMode(8, NULL); // Displays White screen + Rotates to get rid of any glitchy screen effects
 
-  //Setup Audio
-  mySoftwareSerial.begin(9600); //CHANGE SERIAL??
+  //Setup Serial
+  mySoftwareSerial.begin(9600); 
   Serial.begin(115200);
   
   //Audio Debug
@@ -97,17 +97,17 @@ void setup() {
     while(true);
   }
   Serial.println(F("DFPlayer Mini online."));
-  
-  myDFPlayer.volume(6);  //Set volume value. From 0 to 30
 
-
-  pinMode(buttonPinOne, INPUT_PULLUP);  // Initialize the button pin as an input
+  pinMode(buttonPinOne, INPUT_PULLUP);  // Initialize the button pins as an input
   pinMode(buttonPinTwo, INPUT_PULLUP);
-  butLst = digitalRead(buttonPinOne);
+  butLst = digitalRead(buttonPinOne); 
 
 }
 
-
+/*
+ * Function to increment index for audio array
+ * Returns current index
+*/
 int incrementIndex(int currIndex) {
   if (currIndex < 3) {
     Serial.println(currIndex + 1);
@@ -118,6 +118,12 @@ int incrementIndex(int currIndex) {
     return 1;
   }
 }
+
+/*
+ * Function to play (loop) audio with input as index of audio array
+ * Calls display type to output type of audio playing
+ * No return type
+*/
 
 void playAudio(int audioType) {
   switch (audioType) {
@@ -143,8 +149,9 @@ void playAudio(int audioType) {
   }
 }
 
+
 void loop() {
-  if (startScreenPlayed == false) {
+  if (startScreenPlayed == false) { //Displays Startup screen once and begins playing audio
     tempDisplayMode(1, NULL);
     startScreenPlayed = true;
     playAudio(1);
@@ -159,26 +166,26 @@ void loop() {
     if (manualVol == true) {
        manualVol = false;
        tempDisplayMode(9, NULL);
-       tempDisplayMode(currDisplayIndex, NULL);
+       tempDisplayMode(currDisplayIndex, NULL); // Displays Automatic Mode
     }
     else {
       manualVol = true;
-      tempDisplayMode(10, NULL);
-      tempDisplayMode(currDisplayIndex, NULL);
+      tempDisplayMode(10, NULL); // Displays Manual Mode
+      tempDisplayMode(currDisplayIndex, NULL); 
     }
   }
-  //Button Code
+  //Button Code for play / pause / skip
   switch (chkButton ())  {
     case SingleClick:
       Serial.println ("single");
-      if (audioPlaying == true) {
+      if (audioPlaying == true) { // Pause Code
         Serial.println("Paused");
         tempDisplayMode(7, NULL);
         myDFPlayer.pause();
         audioPlaying = false;
         tempDisplayMode(currDisplayIndex, NULL);
       }
-      else {
+      else { // Play Code
         audioPlaying = true;
         Serial.println("Play");
         tempDisplayMode(6, NULL);
@@ -187,7 +194,7 @@ void loop() {
       }
       break;
 
-    case DoubleClick:
+    case DoubleClick: // Double Click Code
       Serial.println ("double");
       audioPlaying = true;
       currIndex = incrementIndex(currIndex);
@@ -202,15 +209,6 @@ void loop() {
     Serial.println(volVal);
     if (abs(volVal - prevVolVal) > 20) {
       int val = map(volVal, 0, 1023, 0, 30); //Scale value to volume (value between 0 and 30)
-      /*
-      if (volDisplayFirst == false) {
-        //tempDisplayMode(5, val);
-        volDisplayFirst = true;
-      }
-      else {
-        volDisplayFirst = false;
-      }
-      */
       prevVolVal = volVal;
       //Sets net Volume
       if (val == 0) {
@@ -218,37 +216,27 @@ void loop() {
       }
       else if (val != oldVol) {
         myDFPlayer.volume(val);
-        //Serial.println(myDFPlayer.readVolume());
       }
-      //tempDisplayMode(5, val);
       delay(200);
     }
   }
-   //Code to autochange volume based on decibel level, lets say 40 - 80/90 decibels corresponds to 8-22 volume?
+   //Code to autochange volume based on decibel level
   else {
     float voltageValue,dbValue;
     voltageValue = analogRead(SoundSensorPin) / 1024.0 * VREF;
     dbValue = voltageValue * 50.0; 
-    //Serial.println(dbValue);
     dbVal = int(round(dbValue));
-    int val = map(dbVal, 20, 90, 0, 20);
+    int val = map(dbVal, 20, 90, 0, 24);
     Serial.println(val);
     if (val != oldVol) {
-      /*
-      if (abs(val - oldVol) > 4) {
-        myDFPlayer.volume(oldVol + (val - oldVol));
-        delay(200);
-      }
-      */
       myDFPlayer.volume(val);
       oldVol = val;
     }
     delay(200);
   }
-  
 }
 
-
+//Code to check for single click or double click
 int chkButton (void) {
     const  unsigned long ButTimeout  = 400;
     static unsigned long msecLst;
@@ -277,34 +265,11 @@ int chkButton (void) {
 }
 
 
-// f for fast, s for slow gradual volume change
-void volumeControl(int newVolume, char fastSlow, int oldVolume) {
-  int change = newVolume - oldVolume;
-  if (fastSlow == 'f') {
-    int delay = 10;
-  }
-  else {
-    int delay = 200;
-  }
-  if (change > 0) {
-    for (int i = 0; i < change; i++) {
-      Serial.println("Vol Up: " + myDFPlayer.readVolume());
-      myDFPlayer.volumeUp();
-    }
-  }
-  else if (change < 0) {
-    for (int i = 0; i < abs(change); i++) {
-      Serial.println("Vol Down: " + myDFPlayer.readVolume());
-      myDFPlayer.volumeDown();
-    }
-  }
-}
-
-void displayMode(char noiseToDisplay) {
-//Default display, always runs
-// to do
-}
-
+/*
+ * Function to display different gui screens to the user
+ * Takes input of which display to show and volume (or null)
+ * No return, calls differnt tft functions to output to display
+*/
 void tempDisplayMode(int numToDisplay, int volume) {
   tft.fillScreen(WHITE);    //default display = type of white noise, rest flash on screen
   switch (numToDisplay) {
